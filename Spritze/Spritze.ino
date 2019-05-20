@@ -12,7 +12,8 @@
 #define Baudrate 38400
 #define SC_Serial Serial
 
-int tb  = 0;
+int tbon  = 0;
+int tboff = 0;
 int temp;
 
 byte SectMainToAOG = 0;  // output the Switches to AOG
@@ -23,7 +24,7 @@ byte RelayToAOG[] = {0, 0};
 unsigned long lastAOG_Receive;
 unsigned long lastAOG_Transmit;
 
-const unsigned int LOOP_TIME = 200; //5hz
+const unsigned int LOOP_TIME = 1000; //1hz
 unsigned int currentTime = LOOP_TIME;
 unsigned int lastTime = LOOP_TIME;
 byte watchdogTimer = 0;
@@ -36,16 +37,37 @@ int header = 0, tempHeader = 0;
 void setup() {
   SC_Serial.begin(Baudrate);
 
-  pinMode(Sw1, INPUT);
-  pinMode(Sw2, INPUT);
-  pinMode(Sw3, INPUT);
-  pinMode(Sw4, INPUT);
-  pinMode(Sw5, INPUT);
+  pinMode(Sw1, INPUT_PULLUP);
+  pinMode(Sw2, INPUT_PULLUP);
+  pinMode(Sw3, INPUT_PULLUP);
+  pinMode(Sw4, INPUT_PULLUP);
+  pinMode(Sw5, INPUT_PULLUP);
 }
 
 
 
 void loop() {
+
+  tbon = 0;
+  tboff = 0;
+
+  if (digitalRead(Sw1) == HIGH)tboff += 1;
+  else tbon += 1;
+  if (digitalRead(Sw2) == HIGH)tboff += 2;
+  else tbon += 2;
+  if (digitalRead(Sw3) == HIGH)tboff += 4;
+  else tbon += 4;
+  if (digitalRead(Sw4) == HIGH)tboff += 8;
+  else tbon += 8;
+  if (digitalRead(Sw5) == HIGH)tboff += 16;
+  else tbon += 16;
+
+  if (tboff !=  SectSWOffToAOG[0] || tbon != RelayToAOG[0] ) {
+    SectSWOffToAOG[0] = tboff;
+    //  RelayToAOG[0] = tbon;  // wenn das hier ausgeschaltet ist wir in agopen angezeigt ob der Schalter aktiv ist (unten). die teilbreiten werden von agopen geschaltet
+
+    transmit_AOG();
+  }
 
 
   currentTime = millis();
@@ -58,19 +80,12 @@ void loop() {
 
     //increase the watchdog - reset in data recv.
     watchdogTimer++;
-    //section read
 
-    tb = 0;
-    if (digitalRead(Sw1) == HIGH)tb += 1;
-    if (digitalRead(Sw2) == HIGH)tb += 2;
-    if (digitalRead(Sw3) == HIGH)tb += 4;
-    if (digitalRead(Sw4) == HIGH)tb += 8;
-    if (digitalRead(Sw5) == HIGH)tb += 16;
+    //  transmit_AOG();
 
-    SectSWOffToAOG[0] = tb;
-
-    transmit_AOG();
   } //end of timed loop
+
+
   receive_AOG();
   delay(10);
 }
