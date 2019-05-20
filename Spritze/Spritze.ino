@@ -3,11 +3,15 @@
 // by Andreas Ortner
 // Danke an Brian, MTZ and Coffetrac für die Vorlage
 
-#define Sw1       2  // Teilbreiten 1-5
+#define Sw1       2  // Teilbreiten 1-7
 #define Sw2       3  // 
 #define Sw3       4  // 
 #define Sw4       5
 #define Sw5       6
+//#define Sw6       7
+//#define Sw7       8
+
+#define Input_Mode INPUT_PULLUP  // oder INPUT (5 V am Eingang) oder INPUT_PULLUP (GND gegen Port)
 
 #define Baudrate 38400
 #define SC_Serial Serial
@@ -37,11 +41,13 @@ int header = 0, tempHeader = 0;
 void setup() {
   SC_Serial.begin(Baudrate);
 
-  pinMode(Sw1, INPUT_PULLUP);
-  pinMode(Sw2, INPUT_PULLUP);
-  pinMode(Sw3, INPUT_PULLUP);
-  pinMode(Sw4, INPUT_PULLUP);
-  pinMode(Sw5, INPUT_PULLUP);
+  pinMode(Sw1, Input_Mode);
+  pinMode(Sw2, Input_Mode);
+  pinMode(Sw3, Input_Mode);
+  pinMode(Sw4, Input_Mode);
+  pinMode(Sw5, Input_Mode);
+  //  pinMode(Sw6, Input_Mode);
+  //  pinMode(Sw7, Input_Mode);
 }
 
 
@@ -61,10 +67,16 @@ void loop() {
   else tbon += 8;
   if (digitalRead(Sw5) == HIGH)tboff += 16;
   else tbon += 16;
+  // if (digitalRead(Sw6) == HIGH)tboff += 32;
+  // else tbon += 32;
+  // if (digitalRead(Sw7) == HIGH)tboff += 64;
+  // else tbon += 64;
+
+
 
   if (tboff !=  SectSWOffToAOG[0] || tbon != RelayToAOG[0] ) {
     SectSWOffToAOG[0] = tboff;
-    //  RelayToAOG[0] = tbon;  // wenn das hier ausgeschaltet ist wir in agopen angezeigt ob der Schalter aktiv ist (unten). die teilbreiten werden von agopen geschaltet
+    // RelayToAOG[0] =  tbon;  // wenn das hier ausgeschaltet ist wir in agopen angezeigt ob der Schalter aktiv ist (unten). die teilbreiten werden von agopen geschaltet
 
     transmit_AOG();
   }
@@ -81,7 +93,7 @@ void loop() {
     //increase the watchdog - reset in data recv.
     watchdogTimer++;
 
-    //  transmit_AOG();
+    transmit_AOG();
 
   } //end of timed loop
 
