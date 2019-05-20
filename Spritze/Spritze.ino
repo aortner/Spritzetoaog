@@ -11,7 +11,7 @@
 //#define Sw6       7
 //#define Sw7       8
 
-#define Input_Mode INPUT_PULLUP  // oder INPUT (5 V am Eingang) oder INPUT_PULLUP (GND gegen Port)
+#define Input_Mode INPUT // oder INPUT (5 V am Eingang) oder INPUT_PULLUP (GND gegen Port)
 
 #define Baudrate 38400
 #define SC_Serial Serial
@@ -74,9 +74,9 @@ void loop() {
 
 
 
-  if (tboff !=  SectSWOffToAOG[0] || tbon != RelayToAOG[0] ) {
-    SectSWOffToAOG[0] = tboff;
-    // RelayToAOG[0] =  tbon;  // wenn das hier ausgeschaltet ist wir in agopen angezeigt ob der Schalter aktiv ist (unten). die teilbreiten werden von agopen geschaltet
+  if (tbon !=  SectSWOffToAOG[0] || tboff != RelayToAOG[0] ) {
+    SectSWOffToAOG[0] = tbon;
+    // RelayToAOG[0] =  tboff;  // wenn das hier ausgeschaltet ist wir in agopen angezeigt ob der Schalter aktiv ist (unten). die teilbreiten werden von agopen geschaltet
 
     transmit_AOG();
   }
